@@ -16,6 +16,7 @@ import {
   BSPSY,
   BSCRIM,
 } from "./dataset/poll";
+import AvatarComponent from "./Avatar/AvatarComponent";
 
 const chartSetting = {
   xAxis: [
@@ -142,10 +143,13 @@ function Home() {
                       <div className="HomeCandidate">
                         <div className="HomeprofileRow">
                           <div>
-                            <img
-                              className="HomeimgSize"
-                              alt={candidate.name}
-                              src={candidate.file}
+                            <AvatarComponent
+                              imgStyle={{
+                                height: "55px",
+                                width: "55px",
+                                borderRadius: "50%",
+                              }}
+                              imgSrc={candidate.avatarUrl}
                             />
                           </div>
                         </div>

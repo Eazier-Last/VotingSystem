@@ -25,4 +25,9 @@ export const SidebarData = [
     icon: <GroupIcon />,
     link: "/four",
   },
+  // {
+  //   title: "VotePage",
+  //   icon: <GroupIcon />,
+  //   link: "/VotePage",
+  // },
 ];

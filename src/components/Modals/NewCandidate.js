@@ -12,7 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { supabase } from "../client";
 
 function NewCandidate({ toggleModal, onSubmit, candidate }) {
-  const [file, setFile] = useState();
+  const [avatarUrl, setAvatarUrl] = useState(null);
   const [position, setPosition] = useState("");
   const [candidateName, setCandidateName] = useState("");
   const [skills, setSkills] = useState("");
@@ -27,9 +27,45 @@ function NewCandidate({ toggleModal, onSubmit, candidate }) {
       setDescription(candidate.description);
       setCampaignObjective(candidate.campaignObjective);
       setPosition(candidate.position);
-      setFile(candidate.file);
+      setAvatarUrl(candidate.arvatarUrl);
     }
   }, [candidate]);
+
+  //This one is free only showing base64 image
+  const convertToBase64 = (file) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file.target.files[0]);
+    reader.onload = () => {
+      setAvatarUrl(reader.result);
+    };
+    reader.onerror = (error) => {
+      console.log("Error: ", error);
+    };
+  };
+
+  //This feature is if you want to upload photo in supabase (50mb only free)
+  // const handleImageUpload = async (event) => {
+  //   const file = event.target.files[0];
+  //   const fileName = file.name;
+  //   setLoading(true);
+
+  //   const { error } = await supabase.storage
+  //     .from("avatars")
+  //     .upload(fileName, file);
+
+  //   if (error) {
+  //     console.error("Error uploading image:", error);
+  //     if (error.error === "Duplicate")
+  //       window.alert("File is duplicate, Please change image name!");
+  //     setLoading(false);
+  //   } else {
+  //     const { data } = await supabase.storage
+  //       .from("avatars")
+  //       .getPublicUrl(fileName);
+  //     setAvatarUrl(data.publicUrl);
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchPositions = async () => {
     const { data, error } = await supabase.from("positions").select("*");
@@ -48,14 +84,6 @@ function NewCandidate({ toggleModal, onSubmit, candidate }) {
     setPosition(event.target.value);
   };
 
-  function handleImage(e) {
-    if (e.target.files && e.target.files[0]) {
-      setFile(URL.createObjectURL(e.target.files[0]));
-    } else {
-      setFile(null);
-    }
-  }
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -64,7 +92,7 @@ function NewCandidate({ toggleModal, onSubmit, candidate }) {
       !skills ||
       !description ||
       !campaignObjective ||
-      !file ||
+      !avatarUrl ||
       !position
     ) {
       alert("Please fill all fields!");
@@ -77,7 +105,7 @@ function NewCandidate({ toggleModal, onSubmit, candidate }) {
       description,
       campaignObjective,
       position,
-      file,
+      avatarUrl,
     };
 
     onSubmit(candidateData);
@@ -86,7 +114,7 @@ function NewCandidate({ toggleModal, onSubmit, candidate }) {
     setSkills("");
     setDescription("");
     setCampaignObjective("");
-    setFile(null);
+    setAvatarUrl(null);
     setPosition("");
     toggleModal();
   };
@@ -201,23 +229,29 @@ function NewCandidate({ toggleModal, onSubmit, candidate }) {
               </div>
             </Box>
           </div>
-          <div>
-            <label className="uploadIcon" htmlFor="imageUpload">
-              <AddPhotoAlternateIcon sx={{ fontSize: 100 }} />
-            </label>
-            <br />
-            <span>Upload Image</span>
-            <input
-              type="file"
-              id="imageUpload"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={handleImage}
-              required
-            />
-          </div>
+
+          {!avatarUrl && (
+            <div>
+              <label className="uploadIcon" htmlFor="imageUpload">
+                <AddPhotoAlternateIcon sx={{ fontSize: 100 }} />
+              </label>
+              <br />
+              <span>Upload Image</span>
+              <input
+                type="file"
+                id="imageUpload"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={convertToBase64}
+                required
+              />
+            </div>
+          )}
+
           <div className="preview">
-            {file && <img className="imgSize" src={file} alt="candidate" />}
+            {avatarUrl && (
+              <img className="imgSize" src={avatarUrl} alt="candidate" />
+            )}
           </div>
           <Button
             type="submit"

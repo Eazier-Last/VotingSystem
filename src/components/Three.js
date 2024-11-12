@@ -3,6 +3,7 @@ import "../App.css";
 import Button from "@mui/material/Button";
 import NewCandidate from "./Modals/NewCandidate";
 import { supabase } from "./client";
+import AvatarComponent from "./Avatar/AvatarComponent";
 
 function Three() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,15 +14,14 @@ function Three() {
   };
 
   const handleCandidateSubmit = async (candidate) => {
-    const { data, error } = await supabase
-      .from("candidates")
-      .insert([candidate]);
+    const { error } = await supabase.from("candidates").insert([candidate]);
     if (error) {
       console.error("Error saving candidate:", error);
       return;
     }
 
-    setCandidates((prev) => [...prev, data[0]]);
+    setCandidates([...candidates, candidate]);
+
     toggleModal();
   };
 
@@ -75,10 +75,13 @@ function Three() {
                 {groupedCandidates[position].map((candidate, index) => (
                   <div key={index}>
                     <div className="profileRow">
-                      <img
-                        className="imgSize"
-                        alt={candidate.name}
-                        src={candidate.file}
+                      <AvatarComponent
+                        imgStyle={{
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: "10px",
+                        }}
+                        imgSrc={candidate.avatarUrl}
                       />
                     </div>
                     <div className="candidateName">
